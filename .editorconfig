@@ -1,0 +1,26 @@
+<<<<<<< HEAD
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = false
+
+
+[*.{json,md,yaml}]
+=======
+root = true
+
+[*]
+indent_style = space
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = false
+
+
+[*.{json,md,yaml}]
+>>>>>>> f2ad6d8a317c6b14c7704f1bc670d29b1c0f1d0b
+indent_size = 2
