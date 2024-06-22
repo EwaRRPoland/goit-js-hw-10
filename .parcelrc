@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "extends": [
     "@parcel/config-default"
@@ -8,14 +7,3 @@
     "parcel-reporter-clean-dist"
   ]
 }
-=======
-{
-  "extends": [
-    "@parcel/config-default"
-  ],
-  "reporters": [
-    "...",
-    "parcel-reporter-clean-dist"
-  ]
-}
->>>>>>> f2ad6d8a317c6b14c7704f1bc670d29b1c0f1d0b
