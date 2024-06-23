@@ -1,49 +1,112 @@
-import fetchCountries from './fetchCountries'; // Import funkcji fetchCountries z pliku fetchCountries.js
-const searchBox = document.getElementById('search-box');
-let timeoutId;
+// Importowanie funkcji fetchCountries z pliku fetchCountries.js
+import { fetchCountries } from './fetchCountries.js';
+// Importowanie funkcji debounce z biblioteki lodash
+import debounce from 'lodash.debounce';
+// Importowanie klasy Notify z biblioteki notiflix
+import { Notify } from 'notiflix';
 
-// Funkcja debounce
-function customDebounce(callback, delay) {
-    return function (...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            callback(...args);
-        }, delay);
-    };
+// Pobranie referencji do pola wyszukiwania
+const searchBox = document.querySelector('input#search-box');
+// Pobranie referencji do listy krajów
+const listCountry = document.querySelector('.country-list');
+// Pobranie referencji do informacji o kraju
+const infoCountry = document.querySelector('.country-info');
+
+// Opóźnienie dla funkcji debounce
+const Debounce_DELAY = 300;
+
+// Obsługa zdarzenia wprowadzania tekstu w polu wyszukiwania
+function inputHandler(event) {
+    const searchInput = event.target.value.trim();
+    cleanCountry();// Wyczyszczenie informacji o kraju
+    cleanListCountry();// Wyczyszczenie listy krajów
+
+
+    //Wywołanie funkcji fetchCountries, aby pobrać dane o krajach
+        fetchCountries(searchInput)
+            .then(data => {
+                if (data.length > 10) {
+                    // Wyświetlenie komunikatu, jeśli znaleziono zbyt wiele pasujących krajów
+                    Notify.info('Too many matches found. Please enter a more specific name.');
+                    return;
+                }
+                 // Wygenerowanie widoku danych o kraju
+                countryDataMarkup(data);
+            })
+            .catch(error => {
+                // Obsługa błędów (np. brak połączenia z API)
+                Notify.failure(error.message);
+        });
+    }
+
+
+
+    
+// Funkcja generująca kod HTML dla listy krajów
+function createListMarkup(data) {
+    return data.map(({ name, flags }) =>
+        `<li class="country-list_item" data-country="${name.common}">
+            <img src="${flags.svg}" alt="${name.common}" height="30px" style="height: 30px;"> ${name.official}
+        </li><br><br>`
+    ).join('');
 }
 
-// Obsługa zdarzenia input w polu wyszukiwania
-searchBox.addEventListener('input', customDebounce(async (event) => {
-    const countryList = document.getElementById('country-list');
+// Funkcja generująca kod HTML dla informacji o kraju
+function createDataMarkup(data) {
+    const countryElement = data[0];
+    const { name, capital, population, flags, languages } = countryElement;
+    return `
+        <div class="country-item">
+           <img src="${flags.svg}" alt="${name.common}" height="30px" style="height: 30px;">
+
+            <h1>${name.official}</h1>
+            <p><b>Capital:</b> ${capital}</p>
+            <p><b>Population:</b> ${population}</p>
+            <p><b>Languages:</b> ${Object.values(languages).join(', ')}</p>
+        </div>
+    `;
+}
+
+// Funkcja wyświetlająca dane o kraju
+function countryDataMarkup(data) {
     const countryInfo = document.getElementById('country-info');
-    const searchTerm = event.target.value.trim();
+    const countryList = document.getElementById('country-list');
 
-    if (searchTerm) {
-        try {
-            const countries = await fetchCountries(searchTerm);
-
-            if (countries.length === 0) {
-                // Wyświetl komunikat o braku wyników
-                countryList.innerHTML = 'Oops, there is no country with that name.';
-                countryInfo.innerHTML = '';
-            } else if (countries.length > 10) {
-                // Wyświetl komunikat o zbyt wielu wynikach
-                countryList.innerHTML = 'Too many matches found. Please enter a more specific name.';
-                countryInfo.innerHTML = '';
-            } else {
-                // Wyświetl listę krajów
-                countryList.innerHTML = countries.map(country => `<div>${country.name}</div>`).join('');
-                countryInfo.innerHTML = '';
-            }
-        } catch (error) {
-            console.error('An error occurred:', error);
-            // Wyświetl komunikat o błędzie
-            countryList.innerHTML = 'An error occurred. Please try again later.';
-            countryInfo.innerHTML = '';
-        }
+    if (data.length === 1) {
+         // Wyświetlenie informacji o pojedynczym kraju
+        const dataMarkup = createDataMarkup(data);
+        countryInfo.innerHTML = dataMarkup;
     } else {
-        // Wyczyszczanie wyników
-        countryList.innerHTML = '';
-        countryInfo.innerHTML = '';
+        // Wyświetlenie listy pasujących krajów
+        const listMarkup = createListMarkup(data);
+        countryList.innerHTML = listMarkup;
+
+         // Obsługa kliknięcia na element li w liście krajów
+        const listItems = document.querySelectorAll('.country-list_item');
+        listItems.forEach(item => {
+            item.addEventListener('click', event => {
+                const clickedCountry = event.currentTarget.dataset.country;
+                const wantedCountry = data.filter(country => country.name.common === clickedCountry);
+                countryInfo.innerHTML = createDataMarkup(wantedCountry);
+                cleanListCountry();
+            });
+        });
     }
-}, 300)); // Debounce na 300ms
+}
+
+// Nasłuchiwanie zdarzenia wprowadzania tekstu w polu wyszukiwania z opóźnieniem
+searchBox.addEventListener('input', debounce(inputHandler, Debounce_DELAY));
+
+ //wyczyszczenie informacji o kraju wyświetlanych na stronie
+function cleanCountry() {
+    const countryInfo = document.getElementById('country-info');
+    countryInfo.innerHTML = '';
+}
+
+
+//wyczyszczenie listy krajów wyświetlanej na stronie
+function cleanListCountry() {
+    const countryList = document.getElementById('country-list');
+    countryList.innerHTML = '';
+}
+
