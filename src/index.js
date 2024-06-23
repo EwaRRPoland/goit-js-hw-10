@@ -23,25 +23,22 @@ function inputHandler(event) {
 
 
     //Wywołanie funkcji fetchCountries, aby pobrać dane o krajach
-        fetchCountries(searchInput)
-            .then(data => {
-                if (data.length > 10) {
-                    // Wyświetlenie komunikatu, jeśli znaleziono zbyt wiele pasujących krajów
-                    Notify.info('Too many matches found. Please enter a more specific name.');
-                    return;
-                }
-                 // Wygenerowanie widoku danych o kraju
-                countryDataMarkup(data);
-            })
-            .catch(error => {
-                // Obsługa błędów (np. brak połączenia z API)
-                Notify.failure(error.message);
-        });
+    fetchCountries(searchInput)
+        .then(data => {
+            if (data.length > 10) {
+                // Wyświetlenie komunikatu, jeśli znaleziono zbyt wiele pasujących krajów
+                Notify.info('Too many matches found. Please enter a more specific name.');
+                return;
+            }
+            // Wygenerowanie widoku danych o kraju
+            countryDataMarkup(data);
+        })
+        .catch(error => {
+        ///Obsługa błędów 
+         Notify.failure('There is no country with this name.');
+         }); 
     }
 
-
-
-    
 // Funkcja generująca kod HTML dla listy krajów
 function createListMarkup(data) {
     return data.map(({ name, flags }) =>
