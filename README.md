@@ -1,4 +1,4 @@
-# Kryteria akceptacji
+# Kryteria akceptacji HW10
 
 Utworzono repozytorium ``goit-js-hw-10``.
 Zadanie domowe zawiera dwa linki: do plików źródłowych і strony roboczej na ``GitHub Pages``.
