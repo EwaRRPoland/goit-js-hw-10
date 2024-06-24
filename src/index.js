@@ -13,7 +13,7 @@ const listCountry = document.querySelector('.country-list');
 const infoCountry = document.querySelector('.country-info');
 
 // Opóźnienie dla funkcji debounce
-const Debounce_DELAY = 300;
+const Debounce_DELAY = 800;
 
 // Obsługa zdarzenia wprowadzania tekstu w polu wyszukiwania
 function inputHandler(event) {

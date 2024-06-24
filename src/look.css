@@ -29,3 +29,6 @@ body {
     padding: 10px;
     margin-left: 20px;
 }
+ul {
+    list-style-type: none;
+}
